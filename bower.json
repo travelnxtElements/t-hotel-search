@@ -1,0 +1,40 @@
+{
+  "name": "t-hotel-search",
+  "version": "0.0.0",
+  "authors": [
+    "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
+    "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
+    "Sounak Pal <spal@tavisca.com>",
+    "Ajinkya Tejankar <tejankarajinkya@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "keywords": [
+    "Polymer",
+    "Web",
+    "Components"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": { 
+    "iron-form": "PolymerElements/iron-form#1.0.8",
+    "t-autosuggest": "atomproject/t-autosuggest#0.0.0",
+    "t-button": "atomproject/t-button#0.0.0",
+    "t-calendar": "atomproject/t-calendar#0.0.0",
+    "t-dropdown": "atomproject/t-dropdown#0.0.0",
+    "t-progress": "atomproject/t-progress#0.0.0", 
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "devDependencies": {
+    "webcomponentsjs": "~0.7.14",
+    "iron-component-page": "PolymerElements/iron-component-page#~1.0.6"
+  }
+}

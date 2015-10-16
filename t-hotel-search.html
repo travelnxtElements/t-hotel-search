@@ -1,0 +1,93 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../t-autosuggest/t-autosuggest.html">
+<link rel="import" href="../t-calendar/t-calendar.html">
+<link rel="import" href="../t-button/t-button.html">
+<link rel="import" href="../t-dropdown/t-dropdown.html">
+<link rel="import" href="../iron-form/iron-form.html">
+<link rel="import" href="../t-progress/t-progress.html">
+
+<!--
+  `<t-autosuggest>` is a ajax driven autosuggestion component. 
+
+
+    <t-autosuggest data-url="http://localhost:3000/components/formComponents/t-autosuggest/data.json">
+    </t-autosuggest>   
+-->
+
+<dom-module id="t-hotel-search">
+<style is="custom-style">
+ :host{
+    font-family: var(--primary-font-family);
+    font-size: 12px;
+  }
+
+  .margin-vertical{
+    margin: 7px 0;
+  }
+  .margin-vertical:first-child{
+    margin-top: 14px;
+  }
+  
+  t-button::shadow paper-button paper-material.content{
+      padding: 12.5px 0;
+  }
+</style>
+  
+<template>
+  <t-form class="canvas vertical layout flex" name="hotel-search" heading="Untitled Form" action-button="Left" submit-button-label="Submit" secondary-action-label="Cancel" label-position="Inline">
+            <div class="form flex ">
+                <div class="horizontal flex layout ">
+                    <div class="flex fieldset " data-category="formComponents">
+                        <t-autosuggest label="Untitled Autosuggest" required="" token-param="formattedAddress" data-url="http://atom-project.io/demo/api/air/suggestions" name="AUTOSUGGEST1" param="query" empty-message="No matches found." selected-value="" error-msg="Please select a value!" class=" t-autosuggest-0" no-label-float="">
+                        </t-autosuggest>
+                    </div>
+                </div>
+                <div class="horizontal flex layout  grouped">
+                    <div class="flex fieldset " data-category="formComponents">
+                        <t-calendar id="one" required="" label="Select date" name="CALENDAR1" selected-date="" error-msg="Please select a date!" format="dddd, dd mmm, yyyy" class=" t-calendar-0" no-label-float="">
+                        </t-calendar>
+                    </div>
+                    <div class="flex fieldset " data-category="formComponents">
+                        <t-calendar id="one" required="" label="Select date" name="CALENDAR2" selected-date="" error-msg="Please select a date!" format="dddd, dd mmm, yyyy" class=" t-calendar-0t-calendar-0t-calendar-0" no-label-float="">
+                        </t-calendar>
+                    </div>
+                </div>
+                <div class="horizontal flex layout  grouped">
+                    <div class="flex fieldset " data-category="formComponents">
+                      <t-dropdown data='["1","2","3","4","5"]' required selected-item-label="{{adults}}" name="adults" label="Adults">
+                      </t-dropdown>
+                    </div>
+                    <div class="flex fieldset " data-category="formComponents">
+                      <t-dropdown data='["1","2","3","4","5"]' required selected-item-label="{{children}}" name="children" label="Children"> 
+                      </t-dropdown>
+                    </div>
+                </div>
+            </div>
+        </t-form>
+</template>
+
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 't-hotel-search',
+
+      properties:{
+
+      /**
+       * The number of adult
+       */
+      adults:{type: Number, value:1},
+
+      /**
+       * The number of children
+       */
+      children:{type: Number, value:0},
+      
+    }
+
+    
+  });
+</script>
