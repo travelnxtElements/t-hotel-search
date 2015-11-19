@@ -47,7 +47,7 @@ Polymer({
         /**
          * Child ages
          */
-        childrenAges: Array,
+        childAges: Array,
 
     },
 
@@ -86,15 +86,15 @@ Polymer({
                 "type": 'Hotel'
             };
             //default adult age setup
-            if(provider.adults){
-                for (var i = 0; i < provider.adults; i++) {
+            if(provider.adultCount){
+                for (var i = 0; i < provider.adultCount; i++) {
                     serviceModel.rooms[0].adults.ages.push(25); //TODO: give provision for adult ages also in component api
                 };
             }  
 
-            if(provider.childrenAges){
-                for (var i = 0; i < provider.childrenAges.length; i++) {
-                    serviceModel.rooms[0].children.ages.push(provider.childrenAges[i].age);
+            if(provider.childAges){
+                for (var i = 0; i < provider.childAges.length; i++) {
+                    serviceModel.rooms[0].children.ages.push(provider.childAges[i].age);
                 };
             }
             return serviceModel;  
@@ -127,6 +127,9 @@ Polymer({
             this.fire('error', { message: 'Operation error occured, please try again.'}, { bubbles: false });
         else if(!event.detail.response.status.isSuccessful){
             this.fire('error', { message: event.detail.response.status.message, code: event.detail.response.status.code}, {bubbles: false});
+        }
+        else{
+            this.fire('success', event.detail.response, { bubbles: false});
         }
     },
 

@@ -44,7 +44,7 @@
             <t-stepper class="flex" min="0" max="3" secondary-label="(0-11 years)" plural-label="Children" singular-label="Child" count="{{childCount}}" id="childCount"></t-stepper>
         </div>
         <div class="horizontal layout">
-            <template is="dom-repeat" items="{{childAges}}" as="item.age">
+            <template is="dom-repeat" items="{{childAges}}" as="item">
                 <t-dropdown-menu class="margin-horizontal" label="{{_childAgeDropdownLabel(index)}}" required>
                     <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{item.age}}" selected-attribute="selection">
                         <paper-item selection="1">&lt;= 1 Year</paper-item>
@@ -64,7 +64,7 @@
             </template>
         </div>
         <div class="horizontal layout">
-            <t-button class="primary flex" noink label="Search Hotels" on-click="_initiateSearch"></t-button>
+            <t-button id="search" class="primary flex" noink label="Search Hotels" on-click="_initiateSearch"></t-button>
         </div>
         <div id="providerHolder">
             <content select="#searchProvider"></content>        
@@ -204,9 +204,12 @@ Polymer({
         if(this._validateInput() == false)
             return;
 
-        //iinitiate search    
+        //initiate search    
         this._setUpProviderData ();        
         this._provider.search();
+
+        //show api call progress
+        this._showProgress(true);
     },
 
     _validateInput: function(){        
@@ -229,9 +232,23 @@ Polymer({
         this._provider.childAges = this.childAges;
     },
 
+    _showProgress: function(inProgress){
+        if(inProgress){
+            this.$.search.label = 'Searching Hotels...';
+            this.$.search.disabled = true;
+        }
+        else{
+            this.$.search.label = 'Search Hotels';
+            this.$.search.disabled = false;
+        }
+    },
+
     _successCallback: function(event){
         if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
-            this.fire('success', event, { bubbles: false });
+            this.fire('success', event.detail, { bubbles: false });
+
+            //hide progress
+            this._showProgress(false);
         }
     },
 
@@ -239,7 +256,10 @@ Polymer({
         if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
             this.$.notify.active = true;
             this.$.notify.message = event.detail.message;
-            this.fire('error', event, { bubbles: false });
+            this.fire('error', event.detail, { bubbles: false });
+
+            //hide progress
+            this._showProgress(false);
         }
     }
 });
