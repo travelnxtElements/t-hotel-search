@@ -33,7 +33,7 @@
     "t-dropdown-menu": "atomelements/t-dropdown-menu#0.0.0",
     "t-progress": "atomelements/t-progress#0.0.0",
     "polymer": "Polymer/polymer#^1.0.0",
-    "iron-ajax": "PolymerElements/iron-ajax#1.0.0",
+    "iron-ajax": "PolymerElements/iron-ajax#1.0.0"
   },
   "devDependencies": {
     "webcomponentsjs": "~0.7.14",
