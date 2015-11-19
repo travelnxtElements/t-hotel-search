@@ -1,0 +1,119 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="t-provider-behavior.html">
+
+<dom-module id="t-hotel-search-provider">
+    <template>
+        <iron-ajax id="ajaxCall" 
+            method="POST"            
+            content-type="application/json"
+            handle-as="json"
+            verbose>
+        </iron-ajax>
+    </template>
+</dom-module>
+<script>
+Polymer({
+
+    is: 't-hotel-search-provider',
+
+    properties: {
+
+        /* *
+         * Mystique location suggestion response object
+         */
+        location: Object,
+
+        /**
+         * The date of checking out from the hotel
+         */
+        checkIn: String,
+
+        /**
+         * The date of checking out from the hotel
+         */
+        checkOut: String,
+
+        /**
+         * The number of adult guests
+         */
+        adultCount: Number,
+
+        /**
+         * The number of child guests
+         */
+        childCount: Number,
+
+        /**
+         * Child ages
+         */
+        childrenAges: Array,
+
+    },
+
+    behaviors: [Polymer.ProviderBehavior],
+
+    listeners: {
+        'ajaxCall.response': '_successCallback',
+        'ajaxCall.error': '_errorCallback'
+    },
+
+    search: function(){
+        var provider = this;
+        
+        var buildReq = function(provider){
+            var serviceModel = {
+                "destination": provider.location,
+                "checkInDate": {
+                    "date": provider.checkIn
+                },
+                "checkOutDate": {
+                    "date": provider.checkOut
+                },
+                "rooms": [{
+                    "children": {
+                        "quantity": provider.childCount,
+                        "ages": provider.childrenAges,
+                        "type": 'Child',
+                    },
+                    "adults": {
+                        "quantity": provider.adultCount,
+                        "type": 'Adult',
+                        "ages": [],
+                    }                    
+                }],
+                'responseContentType': 'rates',
+                "type": 'Hotel'
+            };
+            //default adult age setup
+            if(provider.adults){
+                for (var i = 0; i < provider.adults; i++) {
+                    serviceModel.rooms[0].adults.ages.push(25); //TODO: give provision for adult ages also in component api
+                };
+            }  
+            return serviceModel;  
+        }
+        
+        //validate api data before initiating call
+        if(this._validateData()){
+            this.$.ajaxCall.url = this._getUrl();
+            this.$.ajaxCall.body = JSON.stringify(buildReq(this));
+            this.$.ajaxCall.generateRequest();
+        }
+    },
+
+    _successCallback: function(event){
+        console.log(event)
+        if(!event.detail.response || !event.detail.response.status)
+            this.fire('error', { message: 'Operation error occured, please try again.'}, { bubbles: false });
+        else if(!event.detail.response.status.isSuccessful){
+            this.fire('error', { message: event.detail.response.status.message, code: event.detail.response.status.code}, {bubbles: false});
+        }
+    },
+
+    _errorCallback: function(event){
+        console.log(event)
+        this.fire('error', { message: 'Connection error occured, please try again.'}, { bubbles: false })
+    }
+});
+</script>

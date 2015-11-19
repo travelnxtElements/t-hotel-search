@@ -1,93 +1,242 @@
 <link rel="import" href="../polymer/polymer.html">
-
 <link rel="import" href="../t-autosuggest/t-autosuggest.html">
 <link rel="import" href="../t-calendar/t-calendar.html">
 <link rel="import" href="../t-button/t-button.html">
-<link rel="import" href="../t-dropdown/t-dropdown.html">
-<link rel="import" href="../iron-form/iron-form.html">
-<link rel="import" href="../t-progress/t-progress.html">
-
-<!--
-  `<t-autosuggest>` is a ajax driven autosuggestion component. 
-
-
-    <t-autosuggest data-url="http://localhost:3000/components/formComponents/t-autosuggest/data.json">
-    </t-autosuggest>   
--->
+<link rel="import" href="../t-stepper/t-stepper.html">
+<link rel="import" href="../t-dropdown-menu/t-dropdown-menu.html">
+<link rel="import" href="../t-shared-components/theme.html">
+<link rel="import" href="../t-notify/t-notify.html">
 
 <dom-module id="t-hotel-search">
-<style is="custom-style">
- :host{
-    font-family: var(--primary-font-family);
-    font-size: 12px;
-  }
-
-  .margin-vertical{
-    margin: 7px 0;
-  }
-  .margin-vertical:first-child{
-    margin-top: 14px;
-  }
-  
-  t-button::shadow paper-button paper-material.content{
-      padding: 12.5px 0;
-  }
-</style>
-  
-<template>
-  <t-form class="canvas vertical layout flex" name="hotel-search" heading="Untitled Form" action-button="Left" submit-button-label="Submit" secondary-action-label="Cancel" label-position="Inline">
-            <div class="form flex ">
-                <div class="horizontal flex layout ">
-                    <div class="flex fieldset " data-category="formComponents">
-                        <t-autosuggest label="Untitled Autosuggest" required="" token-param="formattedAddress" data-url="http://atom-project.io/demo/api/air/suggestions" name="AUTOSUGGEST1" param="query" empty-message="No matches found." selected-value="" error-msg="Please select a value!" class=" t-autosuggest-0" no-label-float="">
-                        </t-autosuggest>
-                    </div>
-                </div>
-                <div class="horizontal flex layout  grouped">
-                    <div class="flex fieldset " data-category="formComponents">
-                        <t-calendar id="one" required="" label="Select date" name="CALENDAR1" selected-date="" error-msg="Please select a date!" format="dddd, dd mmm, yyyy" class=" t-calendar-0" no-label-float="">
-                        </t-calendar>
-                    </div>
-                    <div class="flex fieldset " data-category="formComponents">
-                        <t-calendar id="one" required="" label="Select date" name="CALENDAR2" selected-date="" error-msg="Please select a date!" format="dddd, dd mmm, yyyy" class=" t-calendar-0t-calendar-0t-calendar-0" no-label-float="">
-                        </t-calendar>
-                    </div>
-                </div>
-                <div class="horizontal flex layout  grouped">
-                    <div class="flex fieldset " data-category="formComponents">
-                      <t-dropdown data='["1","2","3","4","5"]' required selected-item-label="{{adults}}" name="adults" label="Adults">
-                      </t-dropdown>
-                    </div>
-                    <div class="flex fieldset " data-category="formComponents">
-                      <t-dropdown data='["1","2","3","4","5"]' required selected-item-label="{{children}}" name="children" label="Children"> 
-                      </t-dropdown>
-                    </div>
-                </div>
-            </div>
-        </t-form>
-</template>
-
+    <style>
+        :host {
+            font-family: var(--primary-font-family);
+        }
+        
+        .margin-horizontal {
+            margin-right: 5px;
+        }
+        
+        .margin-horizontal:last-child {
+            margin-right: 0;
+        }
+        
+        :host > .layout {
+            margin: 10px 0;
+        }
+    </style>
+    <template>
+        <t-notify id="notify" message="" type="error"></t-notify>
+        <div class="horizontal flex layout">
+            <t-autosuggest id="location" name="location" required selected-item="{{location}}" class="flex" label="Location (city, zip, address, landmark)" token-param="formattedAddress" error-message="You missed this." ></t-autosuggest>
+        </div>
+        <div class="horizontal layout">
+            <t-calendar class="flex margin-horizontal" required label="Check In" name="checkIn" id="checkIn" selected-date="{{checkIn}}" error-msg="You missed this." format="mm/dd/yyyy">
+            </t-calendar>
+            <!-- margin-horizontal is for margin right -->
+            <t-calendar class="flex" required label="Check Out" name="checkOut" id="checkOut" selected-date="{{checkOut}}" error-msg="You missed this." format="mm/dd/yyyy">
+            </t-calendar>
+        </div>
+        <div class="horizontal layout">
+            <t-stepper class="flex" min="1" max="5" plural-label="Adults" singular-label="Adult" secondary-label="(12+ years)" count="{{adultCount}}" id="adultCount"></t-stepper>
+        </div>
+        <div class="horizontal layout">
+            <t-stepper class="flex" min="0" max="3" secondary-label="(0-11 years)" plural-label="Children" singular-label="Child" count="{{childCount}}" id="childCount"></t-stepper>
+        </div>
+        <div class="horizontal layout">
+            <template is="dom-repeat" items="{{childAges}}" as="age">
+                <t-dropdown-menu class="margin-horizontal" label="{{_childAgeDropdownLabel(index)}}" required>
+                    <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{age}}" selected-attribute="selection">
+                        <paper-item selection="1">&lt;= 1 Year</paper-item>
+                        <paper-item selection="2">2 Years</paper-item>
+                        <paper-item selection="3">3 Years</paper-item>
+                        <paper-item selection="4">4 Years</paper-item>
+                        <paper-item selection="5">5 Years</paper-item>
+                        <paper-item selection="6">6 Years</paper-item>
+                        <paper-item selection="7">7 Years</paper-item>
+                        <paper-item selection="8">8 Years</paper-item>
+                        <paper-item selection="9">9 Years</paper-item>
+                        <paper-item selection="10">10 Years</paper-item>
+                        <paper-item selection="11">11 Years</paper-item>
+                    </paper-menu>
+                </t-dropdown-menu>
+            </template>
+        </div>
+        <div class="horizontal layout">
+            <t-button class="primary flex" noink label="Search Hotels" on-click="_initiateSearch"></t-button>
+        </div>
+        <div id="providerHolder">
+            <content select="#searchProvider"></content>        
+        </div>
+    </template>
 </dom-module>
-
 <script>
-  Polymer({
+Polymer({
 
     is: 't-hotel-search',
 
-      properties:{
+    properties: {
 
-      /**
-       * The number of adult
-       */
-      adults:{type: Number, value:1},
+        /* *
+         * The location to search from.
+         * Must be a value picked from suggested locations.
+         */
+        location: {
+            type: Object,
+            value: function() {
+                return null
+            }
+        },
 
-      /**
-       * The number of children
-       */
-      children:{type: Number, value:0},
-      
-    }
+        /**
+         * The date of checking in the hotel.
+         */
+        checkIn: {
+            type: String,
+            value: '',
+            observer: '_checkInChanged'
+        },
 
+        /**
+         * The date of checking out from the hotel
+         */
+        checkOut: {
+            type: String,
+            value: '',
+            observer: '_checkOutChanged'
+        },
+
+        /**
+         * The number of adult guests
+         */
+        adultCount: {
+            type: Number,
+            value: 1
+        },
+
+        /**
+         * The number of child guests
+         */
+        childCount: {
+            type: Number,
+            observer: '_childCountChanged'
+        },
+
+        /**
+         * Child ages ranging from 1-11
+         */
+        childAges: {
+            type: Array,
+            value: function() {
+                return [];
+            }
+        },
     
-  });
+    },
+
+    _provider: null,    
+
+    attached: function(){
+        this._checkAndSubscribeProvider();               
+    },   
+
+    /**
+     * search provider 
+     */    
+    _checkAndSubscribeProvider: function(){    
+        this.set('_provider', Polymer.dom(this).querySelector('#searchProvider'));
+        if(!this._provider){
+            console.error('no search provider resolved with id #searchProvider');
+        }
+        if(typeof this._provider.search != 'function'){
+            console.error('no "search" function is present in given search provider');
+        }        
+        this._provider.addEventListener('success', this._successCallback.bind(this));
+        this._provider.addEventListener('error', this._errorCallback.bind(this));
+    },
+
+    /**
+     * Utility function to construcut child age drop down label ex. Child 1
+     */
+    _childAgeDropdownLabel: function(index) {
+        return "Child " + (index + 1);
+    },    
+    
+    /**
+     * Observer to keep children count and childAges array in sync
+     */
+    _childCountChanged: function(newValue, oldValue) {
+    	if(oldValue == undefined)  //very first time on element instantiation oldValue will be undefined
+    		oldValue = 0;
+
+    	if(newValue > oldValue){
+    		for (var i = 0; i < (newValue -  oldValue); i++) {
+    			this.push('childAges', '');
+    		};
+    	}
+    	else if(newValue < oldValue){
+    		for (var i = 0; i < (oldValue - newValue); i++) {    			
+	      		this.pop('childAges');
+    		};
+    	}
+    },
+
+    /* Observer to handle check in < check out by setting check out min value  */
+    _checkInChanged: function() {
+        if (this.checkIn != '') {
+            this.$.checkOut.picker.set('min', new Date(this.checkIn));
+        }
+    },
+
+    /* Observer to handle check out > check in by setting check in max value  */
+    _checkOutChanged: function() {
+        if (this.checkOut != '') {
+            this.$.checkIn.picker.set('max', new Date(this.checkOut));
+        }
+    },
+
+    _initiateSearch: function() {
+        //validate controls
+        if(this._validateInput() == false)
+            return;
+
+        //iinitiate search     
+        this._provider.search();
+    },
+
+    _validateInput: function(){        
+        var check = true;
+        var x = this.querySelectorAll('[name]');
+        for (var i = 0; i < x.length; i++) {
+            check = x[i].validate();
+            if (!check) {
+                break;             
+            }
+        }
+        return check;
+    },
+
+    _setUpProviderData: function(){
+        this._provider.location = this.location;
+        this._provider.checkIn = this.checkIn;
+        this._provider.checkOut = this.checkOut;
+        this._provider.adultCount = this.adultCount;
+        this._provider.childCount = this.childCount;
+        this._provider.childAges = this.childAges;
+    },
+
+    _successCallback: function(event){
+        if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
+            this.fire('success', event, { bubbles: false });
+        }
+    },
+
+    _errorCallback: function(event){      
+        if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
+            this.$.notify.active = true;
+            this.$.notify.message = event.detail.message;
+            this.fire('error', event, { bubbles: false });
+        }
+    }
+});
 </script>
