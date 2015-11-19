@@ -30,7 +30,7 @@
 
 	function setUp(){
 		var apiBaseUrl = 'http://demo.travelnxt.com/api';
-		var authToken = 'yu2au4szxe45cleycgjhp55a';
+		var authToken = 'e1rcbzhspfp5a5pnfp34nkik';
 		
 		var searchComponent = document.querySelector('t-hotel-search');
 		//searchComponent.$.location.dataUrl = apiBaseUrl + '/content/autosuggest/';
@@ -40,7 +40,7 @@
 		searchComponent.addEventListener('success', onSearchSuccess);
 		searchComponent.addEventListener('error', onSearchFailure);
 
-		var provider = Polymer.dom(searchComponent).children[0]
+		var provider = Polymer.dom(searchComponent).querySelector('#searchProvider');
 		provider.apiBaseUrl = apiBaseUrl;
 		provider.apiRelativeUrl = '/hotel/search';
 		provider.authToken = authToken;

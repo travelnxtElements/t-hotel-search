@@ -44,9 +44,9 @@
             <t-stepper class="flex" min="0" max="3" secondary-label="(0-11 years)" plural-label="Children" singular-label="Child" count="{{childCount}}" id="childCount"></t-stepper>
         </div>
         <div class="horizontal layout">
-            <template is="dom-repeat" items="{{childAges}}" as="age">
+            <template is="dom-repeat" items="{{childAges}}" as="item.age">
                 <t-dropdown-menu class="margin-horizontal" label="{{_childAgeDropdownLabel(index)}}" required>
-                    <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{age}}" selected-attribute="selection">
+                    <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{item.age}}" selected-attribute="selection">
                         <paper-item selection="1">&lt;= 1 Year</paper-item>
                         <paper-item selection="2">2 Years</paper-item>
                         <paper-item selection="3">3 Years</paper-item>
@@ -60,6 +60,7 @@
                         <paper-item selection="11">11 Years</paper-item>
                     </paper-menu>
                 </t-dropdown-menu>
+                <!-- <input value="{{age::input}}"> -->
             </template>
         </div>
         <div class="horizontal layout">
@@ -124,6 +125,7 @@ Polymer({
 
         /**
          * Child ages ranging from 1-11
+         * { age: '' }
          */
         childAges: {
             type: Array,
@@ -171,13 +173,15 @@ Polymer({
 
     	if(newValue > oldValue){
     		for (var i = 0; i < (newValue -  oldValue); i++) {
-    			this.push('childAges', '');
+                //https://github.com/Polymer/polymer/issues/1839 -  
+                //keeping above bug, pushing object instead of string/number
+    			this.push('childAges', { age: '' });  
     		};
     	}
     	else if(newValue < oldValue){
     		for (var i = 0; i < (oldValue - newValue); i++) {    			
 	      		this.pop('childAges');
-    		};
+    		};            
     	}
     },
 
@@ -200,26 +204,26 @@ Polymer({
         if(this._validateInput() == false)
             return;
 
-        //iinitiate search     
+        //iinitiate search    
+        this._setUpProviderData ();        
         this._provider.search();
     },
 
     _validateInput: function(){        
         var check = true;
-        var x = this.querySelectorAll('[name]');
-        for (var i = 0; i < x.length; i++) {
-            check = x[i].validate();
-            if (!check) {
-                break;             
+        var x = this.querySelectorAll('[required]');
+        for (var i = 0; i < x.length; i++) {            
+            if (!x[i].validate()) {
+                check = false;                            
             }
         }
         return check;
     },
 
     _setUpProviderData: function(){
-        this._provider.location = this.location;
-        this._provider.checkIn = this.checkIn;
-        this._provider.checkOut = this.checkOut;
+        this._provider.location = this.location;        
+        this._provider.checkIn = new Date(this.checkIn).toString(); //if this.checkIn is not mm/dd/yyyy or en-US culture, parse string appropriately  
+        this._provider.checkOut = new Date(this.checkOut).toString(); //if this.checkOut is not mm/dd/yyyy or en-US culture, parse string appropriately
         this._provider.adultCount = this.adultCount;
         this._provider.childCount = this.childCount;
         this._provider.childAges = this.childAges;

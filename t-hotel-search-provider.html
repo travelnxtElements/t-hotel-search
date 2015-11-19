@@ -65,15 +65,15 @@ Polymer({
             var serviceModel = {
                 "destination": provider.location,
                 "checkInDate": {
-                    "date": provider.checkIn
+                    "systemDateTime": provider._toSystemDateTimeFormat(provider.checkIn)
                 },
                 "checkOutDate": {
-                    "date": provider.checkOut
+                    "systemDateTime": provider._toSystemDateTimeFormat(provider.checkOut)
                 },
                 "rooms": [{
                     "children": {
                         "quantity": provider.childCount,
-                        "ages": provider.childrenAges,
+                        "ages": [],
                         "type": 'Child',
                     },
                     "adults": {
@@ -91,6 +91,12 @@ Polymer({
                     serviceModel.rooms[0].adults.ages.push(25); //TODO: give provision for adult ages also in component api
                 };
             }  
+
+            if(provider.childrenAges){
+                for (var i = 0; i < provider.childrenAges.length; i++) {
+                    serviceModel.rooms[0].children.ages.push(provider.childrenAges[i].age);
+                };
+            }
             return serviceModel;  
         }
         
@@ -100,6 +106,19 @@ Polymer({
             this.$.ajaxCall.body = JSON.stringify(buildReq(this));
             this.$.ajaxCall.generateRequest();
         }
+    },
+
+    //Mystique specific logic to convert display date to system date (YYYY-MM-DDTHH:MM:SS)
+    //TODO: remove if any date parse/format plugin is setup application 
+    _toSystemDateTimeFormat: function(dateToFormat){
+        if(!dateToFormat)
+            return dateToFormat;
+
+        var tempDate = new Date(dateToFormat); 
+        var systemDateTime = tempDate.getFullYear() + '-';        
+        systemDateTime += (((tempDate.getMonth()+'').length == 1) ? '0' + (tempDate.getMonth() + 1) : (tempDate.getMonth() + 1)) + '-';
+        systemDateTime += (((tempDate.getDate()+'').length == 1) ? '0' + tempDate.getDate() : tempDate.getDate());
+        return  systemDateTime + 'T00:00:00'
     },
 
     _successCallback: function(event){
