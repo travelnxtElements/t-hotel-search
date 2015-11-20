@@ -225,8 +225,8 @@ Polymer({
 
     _setUpProviderData: function(){
         this._provider.location = this.location;        
-        this._provider.checkIn = new Date(this.checkIn).toString(); //if this.checkIn is not mm/dd/yyyy or en-US culture, parse string appropriately  
-        this._provider.checkOut = new Date(this.checkOut).toString(); //if this.checkOut is not mm/dd/yyyy or en-US culture, parse string appropriately
+        this._provider.checkIn = this.checkIn;
+        this._provider.checkOut = this.checkOut;
         this._provider.adultCount = this.adultCount;
         this._provider.childCount = this.childCount;
         this._provider.childAges = this.childAges;
@@ -245,8 +245,6 @@ Polymer({
 
     _successCallback: function(event){
         if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
-            this.fire('success', event.detail, { bubbles: false });
-
             //hide progress
             this._showProgress(false);
         }
@@ -255,12 +253,12 @@ Polymer({
     _errorCallback: function(event){      
         if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
             this.$.notify.active = true;
-            this.$.notify.message = event.detail.message;
-            this.fire('error', event.detail, { bubbles: false });
-
+            this.$.notify.message = event.detail;
+            
             //hide progress
             this._showProgress(false);
         }
     }
+    
 });
 </script>

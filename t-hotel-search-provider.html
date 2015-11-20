@@ -55,7 +55,8 @@ Polymer({
 
     listeners: {
         'ajaxCall.response': '_successCallback',
-        'ajaxCall.error': '_errorCallback'
+        'ajaxCall.error': '_errorCallback',
+        'ajaxCall.request': '_requestCallback'
     },
 
     search: function(){
@@ -65,10 +66,12 @@ Polymer({
             var serviceModel = {
                 "destination": provider.location,
                 "checkInDate": {
-                    "systemDateTime": provider._toSystemDateTimeFormat(provider.checkIn)
+                    "date": provider.checkIn,
+                    "systemDateTime": provider._toSystemDateTimeFormat(new Date(provider.checkIn))  //if provider.checkIn is not mm/dd/yyyy or en-US culture, parse string according to culture / globalization                     
                 },
                 "checkOutDate": {
-                    "systemDateTime": provider._toSystemDateTimeFormat(provider.checkOut)
+                    "date": provider.checkOut,
+                    "systemDateTime": provider._toSystemDateTimeFormat(new Date(provider.checkOut)) //if provider.checkOut is not mm/dd/yyyy or en-US culture, parse string according to culture / globalization                     
                 },
                 "rooms": [{
                     "children": {
@@ -114,19 +117,21 @@ Polymer({
         if(!dateToFormat)
             return dateToFormat;
 
-        var tempDate = new Date(dateToFormat); 
-        var systemDateTime = tempDate.getFullYear() + '-';        
-        systemDateTime += (((tempDate.getMonth()+'').length == 1) ? '0' + (tempDate.getMonth() + 1) : (tempDate.getMonth() + 1)) + '-';
-        systemDateTime += (((tempDate.getDate()+'').length == 1) ? '0' + tempDate.getDate() : tempDate.getDate());
+        var systemDateTime = dateToFormat.getFullYear() + '-';        
+        systemDateTime += (((dateToFormat.getMonth()+'').length == 1) ? '0' + (dateToFormat.getMonth() + 1) : (dateToFormat.getMonth() + 1)) + '-';
+        systemDateTime += (((dateToFormat.getDate()+'').length == 1) ? '0' + dateToFormat.getDate() : dateToFormat.getDate());
         return  systemDateTime + 'T00:00:00'
     },
 
+    _requestCallback: function(){
+        this.fire('request', this.$.ajaxCall.toRequestOptions(), { bubbles: false });
+    },
+
     _successCallback: function(event){
-        console.log(event)
         if(!event.detail.response || !event.detail.response.status)
-            this.fire('error', { message: 'Operation error occured, please try again.'}, { bubbles: false });
+            this.fire('error', 'Operation error occured, please try again.', { bubbles: false });
         else if(!event.detail.response.status.isSuccessful){
-            this.fire('error', { message: event.detail.response.status.message, code: event.detail.response.status.code}, {bubbles: false});
+            this.fire('error', event.detail.response.status.message, {bubbles: false});
         }
         else{
             this.fire('success', event.detail.response, { bubbles: false});
@@ -134,8 +139,7 @@ Polymer({
     },
 
     _errorCallback: function(event){
-        console.log(event)
-        this.fire('error', { message: 'Connection error occured, please try again.'}, { bubbles: false })
+        this.fire('error', 'Connection error occured, please try again.', { bubbles: false })
     }
 });
 </script>
