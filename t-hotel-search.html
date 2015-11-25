@@ -11,18 +11,22 @@
     <style>
         :host {
             font-family: var(--primary-font-family);
+            display: block;
+            padding: 0 10px;
         }
         
         .margin-horizontal {
             margin-right: 5px;
         }
-        
-        .margin-horizontal:last-child {
+        .margin-horizontal:last-of-type {
             margin-right: 0;
         }
         
         :host > .layout {
-            margin: 10px 0;
+            margin: 15px 0;
+        }
+        .dropdown{
+            width: 33%;
         }
     </style>
     <template>
@@ -45,7 +49,7 @@
         </div>
         <div class="horizontal layout">
             <template is="dom-repeat" items="{{childAges}}" as="item">
-                <t-dropdown-menu class="margin-horizontal" label="{{_childAgeDropdownLabel(index)}}" required>
+                <t-dropdown-menu class="dropdown margin-horizontal" label="{{_childAgeDropdownLabel(index)}}" required>
                     <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{item.age}}" selected-attribute="selection">
                         <paper-item selection="1">&lt;= 1 Year</paper-item>
                         <paper-item selection="2">2 Years</paper-item>
