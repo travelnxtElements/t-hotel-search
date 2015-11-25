@@ -17,17 +17,22 @@
         <style>
         :host {
             font-family: var(--primary-font-family);
+            display: block;
+            padding: 0 10px;
         }
         
         .margin-horizontal {
             margin-right: 5px;
         }
-        .margin-horizontal:last-child {
+        .margin-horizontal:last-of-type {
             margin-right: 0;
         }
         
         :host > .layout {
-            margin: 10px 0;
+            margin: 15px 0;
+        }
+        .dropdown{
+            width: 33%;
         }
         </style>
         <div class="horizontal flex layout">
@@ -48,7 +53,7 @@
         </div>
         <div class="horizontal layout">
             <template is="dom-repeat" items="{{rooms.children.ages}}" as="age">
-                <t-dropdown-menu name="{{index}}" class="margin-horizontal" label="Dinosaurs" required>
+                <t-dropdown-menu name="{{index}}" class="dropdown margin-horizontal" label="Dinosaurs" required>
 		            <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{age}}">
 		              <template is="dom-repeat" items="[[ages]]" as="item">
 		                <paper-item selection="{{item.value}}">[[item.key]]</paper-item>
