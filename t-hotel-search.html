@@ -53,17 +53,18 @@
                 <template is="dom-repeat" items="{{childAges}}" as="item">
                     <t-dropdown-menu class="dropdown margin-horizontal" label="{{_childAgeDropdownLabel(index)}}" required>
                         <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{item.age}}" selected-attribute="selection">
-                            <paper-item selection="1">&lt;= 1 Year</paper-item>
-                            <paper-item selection="2">2 Years</paper-item>
-                            <paper-item selection="3">3 Years</paper-item>
-                            <paper-item selection="4">4 Years</paper-item>
-                            <paper-item selection="5">5 Years</paper-item>
-                            <paper-item selection="6">6 Years</paper-item>
-                            <paper-item selection="7">7 Years</paper-item>
-                            <paper-item selection="8">8 Years</paper-item>
-                            <paper-item selection="9">9 Years</paper-item>
-                            <paper-item selection="10">10 Years</paper-item>
-                            <paper-item selection="11">11 Years</paper-item>
+                            <paper-item selection="0">&lt;1</paper-item>
+                            <paper-item selection="1">1</paper-item>
+                            <paper-item selection="2">2</paper-item>
+                            <paper-item selection="3">3</paper-item>
+                            <paper-item selection="4">4</paper-item>
+                            <paper-item selection="5">5</paper-item>
+                            <paper-item selection="6">6</paper-item>
+                            <paper-item selection="7">7</paper-item>
+                            <paper-item selection="8">8</paper-item>
+                            <paper-item selection="9">9</paper-item>
+                            <paper-item selection="10">10</paper-item>
+                            <paper-item selection="11">11</paper-item>
                         </paper-menu>
                     </t-dropdown-menu>
                     <!-- <input value="{{age::input}}"> -->
