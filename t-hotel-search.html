@@ -36,7 +36,7 @@
         }
         </style>
         <div class="horizontal flex layout">
-            <t-autosuggest id="location" name="location" required selected-item="{{response.destination}}" query-params="{{queryParams}}" class="flex" label="Location (city, zip, address,landmark)" token-param="formattedAddress" data-url="{{suggestionUrl}}" error-message="You missed this."></t-autosuggest>
+            <t-autosuggest id="location" name="location" required selected-item="{{response.destination}}" query-params="{{queryParams}}" class="flex" label="Search city, zip, address or landmark" token-param="formattedAddress" data-url="{{suggestionUrl}}" error-message="You missed this."></t-autosuggest>
         </div>
         <div class="horizontal layout">
             <t-calendar class="flex margin-horizontal" required label="Check In" name="CALENDAR1" selected-date="{{response.checkInDate.date}}" error-msg="You missed this." format="dddd, dd mmm, yyyy" submit-format="ddd, dd mmm, yyyy">
