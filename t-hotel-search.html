@@ -34,13 +34,13 @@
         <t-notify id="notify" message="" type="error"></t-notify>
         <div class="section">
             <div class="horizontal flex layout">
-                <t-autosuggest id="location" name="location" required selected-item="{{location}}" class="flex" label="Location (city, zip, address, landmark)" token-param="formattedAddress" error-message="You missed this." ></t-autosuggest>
+                <t-autosuggest id="location" name="location" required selected-item="{{location}}" class="flex" label="Search city, address, zip or landmark" token-param="formattedAddress" error-message="You missed this." ></t-autosuggest>
             </div>
             <div class="horizontal layout">
-                <t-calendar class="flex margin-horizontal" required label="Check In" name="checkIn" id="checkIn" selected-date="{{checkIn}}" error-msg="You missed this." format="mm/dd/yyyy">
+                <t-calendar class="flex margin-horizontal" required label="Check-in" name="checkIn" id="checkIn" selected-date="{{checkIn}}" error-msg="You missed this." format="mm/dd/yyyy">
                 </t-calendar>
                 <!-- margin-horizontal is for margin right -->
-                <t-calendar class="flex" required label="Check Out" name="checkOut" id="checkOut" selected-date="{{checkOut}}" error-msg="You missed this." format="mm/dd/yyyy">
+                <t-calendar class="flex" required label="Check-out" name="checkOut" id="checkOut" selected-date="{{checkOut}}" error-msg="You missed this." format="mm/dd/yyyy">
                 </t-calendar>
             </div>
             <div class="horizontal layout">
