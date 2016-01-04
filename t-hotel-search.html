@@ -146,7 +146,8 @@ Polymer({
     _provider: null,    
 
     attached: function(){
-        this._checkAndSubscribeProvider();               
+        this._checkAndSubscribeProvider();
+        this._checkInChanged();
     },   
 
     /**
@@ -196,15 +197,18 @@ Polymer({
     _checkInChanged: function() {
         if (this.checkIn != '') {
             var nextDay = new Date().setDate(new Date(this.checkIn).getDate() +1);
-            this.$.checkOut.picker.set('min', new Date(nextDay));
+            if(this.$.checkOut.picker){
+                this.$.checkOut.picker.set('min', new Date(nextDay));
+            }
         }
     },
 
     /* Observer to handle check out > check in by setting check in max value  */
     _checkOutChanged: function() {
         if (this.checkOut != '') {
-
-            this.$.checkIn.picker.set('max', new Date(this.checkOut));
+            if(this.$.checkIn.picker){
+                this.$.checkIn.picker.set('max', new Date(this.checkOut));
+            }
         }
     },
 
