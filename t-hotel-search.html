@@ -208,7 +208,7 @@ Polymer({
         if (this.checkOut != '') {
             var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() -1);
             if(this.$.checkIn.picker){
-                this.$.checkIn.picker.set('max', new Date(this.checkOut));
+                this.$.checkIn.picker.set('max', false);
             }
         }
     },
