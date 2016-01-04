@@ -79,200 +79,203 @@
     </template>
 </dom-module>
 <script>
-Polymer({
+    Polymer({
 
-    is: 't-hotel-search',
+        is: 't-hotel-search',
 
-    properties: {
+        properties: {
 
-        /* *
-         * The location to search from.
-         * Must be a value picked from suggested locations.
-         */
-        location: {
-            type: Object,
-            value: function() {
-                return null
-            }
+            /* *
+             * The location to search from.
+             * Must be a value picked from suggested locations.
+             */
+            location: {
+                type: Object,
+                value: function () {
+                    return null
+                }
+            },
+
+            /**
+             * The date of checking in the hotel.
+             */
+            checkIn: {
+                type: String,
+                value: '',
+                observer: '_checkInChanged'
+            },
+
+            /**
+             * The date of checking out from the hotel
+             */
+            checkOut: {
+                type: String,
+                value: '',
+                observer: '_checkOutChanged'
+            },
+
+            /**
+             * The number of adult guests
+             */
+            adultCount: {
+                type: Number,
+                value: 1
+            },
+
+            /**
+             * The number of child guests
+             */
+            childCount: {
+                type: Number,
+                observer: '_childCountChanged'
+            },
+
+            /**
+             * Child ages ranging from 1-11
+             * { age: '' }
+             */
+            childAges: {
+                type: Array,
+                value: function () {
+                    return [];
+                }
+            },
+
+        },
+
+        _provider: null,
+
+        attached: function () {
+            this._checkAndSubscribeProvider();
+            this._checkInChanged();
         },
 
         /**
-         * The date of checking in the hotel.
+         * search provider 
          */
-        checkIn: {
-            type: String,
-            value: '',
-            observer: '_checkInChanged'
+        _checkAndSubscribeProvider: function () {
+            this.set('_provider', Polymer.dom(this).querySelector('#searchProvider'));
+            if (!this._provider) {
+                console.error('no search provider resolved with id #searchProvider');
+            }
+            if (typeof this._provider.search != 'function') {
+                console.error('no "search" function is present in given search provider');
+            }
+            this._provider.addEventListener('success', this._successCallback.bind(this));
+            this._provider.addEventListener('error', this._errorCallback.bind(this));
         },
 
         /**
-         * The date of checking out from the hotel
+         * Utility function to construcut child age drop down label ex. Child 1
          */
-        checkOut: {
-            type: String,
-            value: '',
-            observer: '_checkOutChanged'
+        _childAgeDropdownLabel: function (index) {
+            return "Child " + (index + 1);
         },
 
         /**
-         * The number of adult guests
+         * Observer to keep children count and childAges array in sync
          */
-        adultCount: {
-            type: Number,
-            value: 1
+        _childCountChanged: function (newValue, oldValue) {
+            if (oldValue == undefined)  //very first time on element instantiation oldValue will be undefined
+                oldValue = 0;
+
+            if (newValue > oldValue) {
+                for (var i = 0; i < (newValue - oldValue) ; i++) {
+                    //https://github.com/Polymer/polymer/issues/1839 -  
+                    //keeping above bug, pushing object instead of string/number
+                    this.push('childAges', { age: '' });
+                };
+            }
+            else if (newValue < oldValue) {
+                for (var i = 0; i < (oldValue - newValue) ; i++) {
+                    this.pop('childAges');
+                };
+            }
         },
 
-        /**
-         * The number of child guests
-         */
-        childCount: {
-            type: Number,
-            observer: '_childCountChanged'
-        },
-
-        /**
-         * Child ages ranging from 1-11
-         * { age: '' }
-         */
-        childAges: {
-            type: Array,
-            value: function() {
-                return [];
+        /* Observer to handle check in < check out by setting check out min value  */
+        _checkInChanged: function () {
+            if (this.checkIn != '') {
+                var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 1)
+                if (this.$.checkOut.picker) {
+                    this.$.checkOut.picker.set('min', new Date(nextDay));
+                    if (new Date(nextDay) >= new Date(this.checkOut)) {
+                        this.$.checkOut._date = new Date(nextDay);
+                    }
+                }
             }
         },
-    
-    },
 
-    _provider: null,    
+        /* Observer to handle check out > check in by setting check in max value  */
+        _checkOutChanged: function () {
+            if (this.checkOut != '') {
+                var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() - 1);
+                if (this.$.checkIn.picker) {
+                    this.$.checkIn.picker.set('max', false);
+                }
+            }
+        },
 
-    attached: function(){
-        this._checkAndSubscribeProvider();
-        this._checkInChanged();
-    },   
+        _initiateSearch: function () {
+            //validate controls
+            if (this._validateInput() == false)
+                return;
 
-    /**
-     * search provider 
-     */    
-    _checkAndSubscribeProvider: function(){    
-        this.set('_provider', Polymer.dom(this).querySelector('#searchProvider'));
-        if(!this._provider){
-            console.error('no search provider resolved with id #searchProvider');
-        }
-        if(typeof this._provider.search != 'function'){
-            console.error('no "search" function is present in given search provider');
-        }        
-        this._provider.addEventListener('success', this._successCallback.bind(this));
-        this._provider.addEventListener('error', this._errorCallback.bind(this));
-    },
+            //initiate search    
+            this._setUpProviderData();
+            this._provider.search();
 
-    /**
-     * Utility function to construcut child age drop down label ex. Child 1
-     */
-    _childAgeDropdownLabel: function(index) {
-        return "Child " + (index + 1);
-    },    
-    
-    /**
-     * Observer to keep children count and childAges array in sync
-     */
-    _childCountChanged: function(newValue, oldValue) {
-    	if(oldValue == undefined)  //very first time on element instantiation oldValue will be undefined
-    		oldValue = 0;
+            //show api call progress
+            this._showProgress(true);
+        },
 
-    	if(newValue > oldValue){
-    		for (var i = 0; i < (newValue -  oldValue); i++) {
-                //https://github.com/Polymer/polymer/issues/1839 -  
-                //keeping above bug, pushing object instead of string/number
-    			this.push('childAges', { age: '' });  
-    		};
-    	}
-    	else if(newValue < oldValue){
-    		for (var i = 0; i < (oldValue - newValue); i++) {    			
-	      		this.pop('childAges');
-    		};            
-    	}
-    },
+        _validateInput: function () {
+            var check = true;
+            var x = this.querySelectorAll('[required]');
+            for (var i = 0; i < x.length; i++) {
+                if (!x[i].validate()) {
+                    check = false;
+                }
+            }
+            return check;
+        },
 
-    /* Observer to handle check in < check out by setting check out min value  */
-    _checkInChanged: function() {
-        if (this.checkIn != '') {
-            var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() +1)
-            if(this.$.checkOut.picker){
-                this.$.checkOut.picker.set('min', new Date(nextDay));
+        _setUpProviderData: function () {
+            this._provider.location = this.location;
+            this._provider.checkIn = this.checkIn;
+            this._provider.checkOut = this.checkOut;
+            this._provider.adultCount = this.adultCount;
+            this._provider.childCount = this.childCount;
+            this._provider.childAges = this.childAges;
+        },
+
+        _showProgress: function (inProgress) {
+            if (inProgress) {
+                this.$.search.label = 'Searching Hotels...';
+                this.$.search.disabled = true;
+            }
+            else {
+                this.$.search.label = 'Search Hotels';
+                this.$.search.disabled = false;
+            }
+        },
+
+        _successCallback: function (event) {
+            if (event.srcElement == this._provider) { //handle event bubbling case by targeting event soure
+                //hide progress
+                //this._showProgress(true);
+            }
+        },
+
+        _errorCallback: function (event) {
+            if (event.srcElement == this._provider) { //handle event bubbling case by targeting event soure
+                this.$.notify.active = true;
+                this.$.notify.message = event.detail;
+
+                //hide progress
+                this._showProgress(false);
             }
         }
-    },
 
-    /* Observer to handle check out > check in by setting check in max value  */
-    _checkOutChanged: function() {
-        if (this.checkOut != '') {
-            var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() -1);
-            if(this.$.checkIn.picker){
-                this.$.checkIn.picker.set('max', false);
-            }
-        }
-    },
-
-    _initiateSearch: function() {
-        //validate controls
-        if(this._validateInput() == false)
-            return;
-
-        //initiate search    
-        this._setUpProviderData ();        
-        this._provider.search();
-
-        //show api call progress
-        this._showProgress(true);
-    },
-
-    _validateInput: function(){        
-        var check = true;
-        var x = this.querySelectorAll('[required]');
-        for (var i = 0; i < x.length; i++) {            
-            if (!x[i].validate()) {
-                check = false;                            
-            }
-        }
-        return check;
-    },
-
-    _setUpProviderData: function(){
-        this._provider.location = this.location;        
-        this._provider.checkIn = this.checkIn;
-        this._provider.checkOut = this.checkOut;
-        this._provider.adultCount = this.adultCount;
-        this._provider.childCount = this.childCount;
-        this._provider.childAges = this.childAges;
-    },
-
-    _showProgress: function(inProgress){
-        if(inProgress){
-            this.$.search.label = 'Searching Hotels...';
-            this.$.search.disabled = true;
-        }
-        else{
-            this.$.search.label = 'Search Hotels';
-            this.$.search.disabled = false;
-        }
-    },
-
-    _successCallback: function(event){
-        if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
-            //hide progress
-            //this._showProgress(true);
-        }
-    },
-
-    _errorCallback: function(event){      
-        if(event.srcElement == this._provider){ //handle event bubbling case by targeting event soure
-            this.$.notify.active = true;
-            this.$.notify.message = event.detail;
-            
-            //hide progress
-            this._showProgress(false);
-        }
-    }
-    
-});
+    });
 </script>
