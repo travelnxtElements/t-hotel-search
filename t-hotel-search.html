@@ -196,7 +196,7 @@ Polymer({
     /* Observer to handle check in < check out by setting check out min value  */
     _checkInChanged: function() {
         if (this.checkIn != '') {
-            var nextDay = new Date().setDate(new Date(this.checkIn).getDate() +1);
+            var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() +1)
             if(this.$.checkOut.picker){
                 this.$.checkOut.picker.set('min', new Date(nextDay));
             }
@@ -206,6 +206,7 @@ Polymer({
     /* Observer to handle check out > check in by setting check in max value  */
     _checkOutChanged: function() {
         if (this.checkOut != '') {
+            var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() -1);
             if(this.$.checkIn.picker){
                 this.$.checkIn.picker.set('max', new Date(this.checkOut));
             }
