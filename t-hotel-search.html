@@ -6,6 +6,18 @@
 <link rel="import" href="../t-dropdown-menu/t-dropdown-menu.html">
 <link rel="import" href="../t-notify/t-notify.html">
 
+<!--
+This component is a form that allows a user to search for Hotels.
+It exposes certain prperties which allow control over different aspects
+of searching.
+
+There are fundamentally three types of properties that form the public
+api of this component.
+
+__User input__: Properties like `location`, `adultCount` etc. reflect the user input
+necessary for searching
+
+-->
 <dom-module id="t-hotel-search">
     <style>
         :host {
