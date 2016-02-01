@@ -210,25 +210,37 @@ necessary for searching
 
         /* Observer to handle check in < check out by setting check out min value  */
         _checkInChanged: function () {
-            if (this.checkIn != '') {
+            setTimeout(function(){
+                if (this.checkIn != '') {
                 var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 1)
                 if (this.$.checkOut.picker) {
                     this.$.checkOut.picker.set('min', new Date(nextDay));
-                    if (new Date(nextDay) >= new Date(this.checkOut)) {
-                        this.$.checkOut._date = new Date(nextDay);
+                    //Patch ATOM 501 additional issue, the next months were not populating in Iphone
+                    setTimeout(function(){
+                        this.$.checkOut.picker.render(true);
+                    }.bind(this), 1100)
+                        if (new Date(nextDay) >= new Date(this.checkOut)) {
+                            this.$.checkOut._date = new Date(nextDay);
+                        }
                     }
                 }
-            }
+            }.bind(this), 10);
         },
 
         /* Observer to handle check out > check in by setting check in max value  */
         _checkOutChanged: function () {
-            if (this.checkOut != '') {
-                var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() - 1);
-                if (this.$.checkIn.picker) {
-                    this.$.checkIn.picker.set('max', false);
+            setTimeout(function(){
+                if (this.checkOut != '') {
+                    var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() - 1);
+                    if (this.$.checkIn.picker) {
+                        this.$.checkIn.picker.set('max', false);
+                        //Patch ATOM 501 additional issue, the next months were not populating in Iphone
+                        setTimeout(function(){
+                            this.$.checkIn.picker.render(true);
+                        }.bind(this), 1100)
+                    }
                 }
-            }
+            }.bind(this), 10);
         },
 
         _initiateSearch: function () {
