@@ -1,12 +1,50 @@
+<!DOCTYPE html>
+<html>
 <head>
 	<link rel="import" href="../t-hotel-search.html">
+		<link rel="import" href="../t-hotel-search-provider.html">
+		<link rel="import" href="../../t-shared-components/theme.html">
 	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700" rel="stylesheet" type="text/css">
-  
-
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<!-- // <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> -->
 	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"> 
 </head>
-<t-hotel-search suggestion-url="../list.json"></t-hotel-search>
+	<body>	
+		<t-hotel-search id="searchComponent">
+			<t-hotel-search-provider id="searchProvider"></t-hotel-search-provider>  	
+		</t-hotel-search>	
+	</body>
+</html>
 
+<script>
+	function onSearchSuccess(event){
+		if(event.srcElement == document.querySelector('t-hotel-search')){
+			alert('search success');
+		}
+	}
+
+	function onSearchFailure(event){
+		if(event.srcElement == document.querySelector('t-hotel-search')){
+			alert('search fail');
+		}
+	}
+
+	function setUp(){
+		var apiBaseUrl = 'http://demo.travelnxt.com/api';
+		var authToken = 'e1rcbzhspfp5a5pnfp34nkik';
+		
+		var searchComponent = document.querySelector('t-hotel-search');
+		//searchComponent.$.location.dataUrl = apiBaseUrl + '/content/autosuggest/';
+		//searchComponent.$.location.queryParams = 'token=' + authToken;
+		searchComponent.$.location.dataUrl = 'list.json';
+
+		searchComponent.addEventListener('success', onSearchSuccess);
+		searchComponent.addEventListener('error', onSearchFailure);
+
+		var provider = Polymer.dom(searchComponent).querySelector('#searchProvider');
+		provider.apiBaseUrl = apiBaseUrl;
+		provider.apiRelativeUrl = '/hotel/search';
+		provider.authToken = authToken;
+	}
+	setUp();
+</script>

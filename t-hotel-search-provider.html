@@ -1,0 +1,145 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="t-provider-behavior.html">
+
+<dom-module id="t-hotel-search-provider">
+    <template>
+        <iron-ajax id="ajaxCall" 
+            method="POST"            
+            content-type="application/json"
+            handle-as="json"
+            verbose>
+        </iron-ajax>
+    </template>
+</dom-module>
+<script>
+Polymer({
+
+    is: 't-hotel-search-provider',
+
+    properties: {
+
+        /* *
+         * Mystique location suggestion response object
+         */
+        location: Object,
+
+        /**
+         * The date of checking out from the hotel
+         */
+        checkIn: String,
+
+        /**
+         * The date of checking out from the hotel
+         */
+        checkOut: String,
+
+        /**
+         * The number of adult guests
+         */
+        adultCount: Number,
+
+        /**
+         * The number of child guests
+         */
+        childCount: Number,
+
+        /**
+         * Child ages
+         */
+        childAges: Array,
+
+    },
+
+    behaviors: [Polymer.ProviderBehavior],
+
+    listeners: {
+        'ajaxCall.response': '_successCallback',
+        'ajaxCall.error': '_errorCallback',
+        'ajaxCall.request': '_requestCallback'
+    },
+
+    search: function(){
+        var provider = this;
+        
+        var buildReq = function(provider){
+            var serviceModel = {
+                "destination": provider.location,
+                "checkInDate": {
+                    "date": provider.checkIn,
+                    "systemDateTime": provider._toSystemDateTimeFormat(new Date(provider.checkIn))  //if provider.checkIn is not mm/dd/yyyy or en-US culture, parse string according to culture / globalization                     
+                },
+                "checkOutDate": {
+                    "date": provider.checkOut,
+                    "systemDateTime": provider._toSystemDateTimeFormat(new Date(provider.checkOut)) //if provider.checkOut is not mm/dd/yyyy or en-US culture, parse string according to culture / globalization                     
+                },
+                "rooms": [{
+                    "children": {
+                        "quantity": provider.childCount,
+                        "ages": [],
+                        "type": 'Child',
+                    },
+                    "adults": {
+                        "quantity": provider.adultCount,
+                        "type": 'Adult',
+                        "ages": [],
+                    }                    
+                }],
+                'responseContentType': 'rates',
+                "type": 'Hotel'
+            };
+            //default adult age setup
+            if(provider.adultCount){
+                for (var i = 0; i < provider.adultCount; i++) {
+                    serviceModel.rooms[0].adults.ages.push(25); //TODO: give provision for adult ages also in component api
+                };
+            }  
+
+            if(provider.childAges){
+                for (var i = 0; i < provider.childAges.length; i++) {
+                    serviceModel.rooms[0].children.ages.push(provider.childAges[i].age);
+                };
+            }
+            return serviceModel;  
+        }
+        
+        //validate api data before initiating call
+        if(this._validateData()){
+            this.$.ajaxCall.url = this._getUrl();
+            this.$.ajaxCall.body = JSON.stringify(buildReq(this));
+            this.$.ajaxCall.generateRequest();
+        }
+    },
+
+    //Mystique specific logic to convert display date to system date (YYYY-MM-DDTHH:MM:SS)
+    //TODO: remove if any date parse/format plugin is setup application 
+    _toSystemDateTimeFormat: function(dateToFormat){
+        if(!dateToFormat)
+            return dateToFormat;
+
+        var systemDateTime = dateToFormat.getFullYear() + '-';        
+        systemDateTime += (((dateToFormat.getMonth()+'').length == 1) ? '0' + (dateToFormat.getMonth() + 1) : (dateToFormat.getMonth() + 1)) + '-';
+        systemDateTime += (((dateToFormat.getDate()+'').length == 1) ? '0' + dateToFormat.getDate() : dateToFormat.getDate());
+        return  systemDateTime + 'T00:00:00'
+    },
+
+    _requestCallback: function(){
+        this.fire('request', this.$.ajaxCall.toRequestOptions(), { bubbles: false });
+    },
+
+    _successCallback: function(event){
+        if(!event.detail.response || !event.detail.response.status)
+            this.fire('error', 'Operation error occured, please try again.', { bubbles: false });
+        else if(!event.detail.response.status.isSuccessful){
+            this.fire('error', event.detail.response.status.message, {bubbles: false});
+        }
+        else{
+            this.fire('success', event.detail.response, { bubbles: false});
+        }
+    },
+
+    _errorCallback: function(event){
+        this.fire('error', 'Connection error occured, please try again.', { bubbles: false })
+    }
+});
+</script>
