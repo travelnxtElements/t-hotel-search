@@ -96,7 +96,7 @@ necessary for searching
 <script>
     Polymer({
 
-    is: 't-hotel-search',
+        is: 't-hotel-search',
 
         properties: {
 
@@ -110,15 +110,6 @@ necessary for searching
                     return null
                 }
             },
-
-        rooms: {
-            type: Object,
-            computed: 'computeRoomsArray(response)',
-            notify:true,
-            observers: 'setData'
-
-        },
-
 
             /**
              * The date of checking in the hotel.
