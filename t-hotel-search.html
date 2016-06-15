@@ -3,10 +3,9 @@
 <link rel="import" href="../t-calendar/t-calendar.html">
 <link rel="import" href="../t-button/t-button.html">
 <link rel="import" href="../t-stepper/t-stepper.html">
-<link rel="import" href="../t-dropdown-menu/t-dropdown-menu.html">
+<link rel="import" href="../t-dropdown/t-dropdown.html">
 <link rel="import" href="../t-notify/t-notify.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
-
 <!--
 This component is a form that allows a user to search for Hotels.
 It exposes certain prperties which allow control over different aspects
@@ -21,35 +20,39 @@ necessary for searching
 -->
 <dom-module id="t-hotel-search">
     <style include="iron-flex">
-        :host {
-            font-family: var(--primary-font-family);
-        }
-        .section{
-            padding: 0 10px;
-        }
-        
-        .margin-horizontal {
-            margin-right: 5px;
-        }
-        .margin-horizontal:last-of-type {
-            margin-right: 0;
-        }
-        
-        .row {
-            margin: 15px 0;
-        }
-        #search {
-            margin-top: 10px;
-        }
-        .dropdown{
-            width: 33%;
-        }
+    :host {
+        font-family: var(--primary-font-family);
+        padding: var(--form-spacing,10px);
+    }
+    
+    
+    .margin-horizontal {
+        margin-right: var(--form-spacing,10px);
+    }
+    
+    .margin-horizontal:last-of-type {
+        margin-right: 0;
+    }
+    
+    .row {
+        margin: 20px 0;
+        display: block;
+    }
+    .row:first-child{
+        margin: 0 0 20px 0;
+        display: block;
+    }
+    #search {
+        margin-top: 10px;
+    }
+    
+    .dropdown {
+        width: 33%;
+    }
     </style>
     <template>
-        <t-notify id="notify" message="" type="error"></t-notify>
-        <div class="section">
             <div class="horizontal flex layout row">
-                <t-autosuggest id="location" name="location" required selected-item="{{location}}" class="flex" label="Search city, address, zip or landmark" token-param="formattedAddress" error-message="You missed this." ></t-autosuggest>
+                <t-autosuggest id="location" name="location" data-url="[[dataUrl]]" query-params="[[queryParams]]" required selected-item="{{location}}" class="flex" label="Search city, address, zip or landmark" token-param="formattedAddress" error-message="You missed this."></t-autosuggest>
             </div>
             <div class="horizontal layout row">
                 <t-calendar class="flex margin-horizontal" required label="Check-in" name="checkIn" id="checkIn" selected-date="{{checkIn}}" error-msg="You missed this." format="mm/dd/yyyy">
@@ -66,244 +69,201 @@ necessary for searching
             </div>
             <div class="horizontal layout row">
                 <template is="dom-repeat" items="{{childAges}}" as="item">
-                    <t-dropdown-menu class="dropdown margin-horizontal" error-message="Age missing!" label="{{_childAgeDropdownLabel(index)}}" required>
-                        <paper-menu class="dropdown-content" attr-for-selected="selection" selected="{{item.age}}" selected-attribute="selection">
-                            <paper-item selection="0">&lt;1</paper-item>
-                            <paper-item selection="1">1</paper-item>
-                            <paper-item selection="2">2</paper-item>
-                            <paper-item selection="3">3</paper-item>
-                            <paper-item selection="4">4</paper-item>
-                            <paper-item selection="5">5</paper-item>
-                            <paper-item selection="6">6</paper-item>
-                            <paper-item selection="7">7</paper-item>
-                            <paper-item selection="8">8</paper-item>
-                            <paper-item selection="9">9</paper-item>
-                            <paper-item selection="10">10</paper-item>
-                            <paper-item selection="11">11</paper-item>
-                        </paper-menu>
-                    </t-dropdown-menu>
+                    <t-dropdown class="dropdown margin-horizontal" error-message="Age missing!" label="{{_childAgeDropdownLabel(index)}}"  selected-item="{{item.age}}" required>
+                            <dropdown-item value="0">&lt;1 year</dropdown-item>
+                            <dropdown-item value="1">1 year</dropdown-item>
+                            <dropdown-item value="2">2 years</dropdown-item>
+                            <dropdown-item value="3">3 years</dropdown-item>
+                            <dropdown-item value="4">4 years</dropdown-item>
+                            <dropdown-item value="5">5 years</dropdown-item>
+                            <dropdown-item value="6">6 years</dropdown-item>
+                            <dropdown-item value="7">7 years</dropdown-item>
+                            <dropdown-item value="8">8 years</dropdown-item>
+                            <dropdown-item value="9">9 years</dropdown-item>
+                            <dropdown-item value="10">10 years</dropdown-item>
+                            <dropdown-item value="11">11 years</dropdown-item>
+                    </t-dropdown>
                     <!-- <input value="{{age::input}}"> -->
                 </template>
             </div>
             <div class="horizontal layout row">
                 <t-button id="search" class="primary flex" noink label="Search Hotels" on-click="_initiateSearch"></t-button>
             </div>
-        </div>
         <div id="providerHolder">
-            <content select="#searchProvider"></content>        
+            <content select="#searchProvider"></content>
         </div>
     </template>
 </dom-module>
 <script>
-    Polymer({
+Polymer({
 
-        is: 't-hotel-search',
+    is: 't-hotel-search',
 
-        properties: {
+    properties: {
 
-            /* *
-             * The location to search from.
-             * Must be a value picked from suggested locations.
-             */
-            location: {
-                type: Object,
-                value: function () {
-                    return null
-                }
-            },
-
-            /**
-             * The date of checking in the hotel.
-             */
-            checkIn: {
-                type: String,
-                value: '',
-                observer: '_checkInChanged'
-            },
-
-            /**
-             * The date of checking out from the hotel
-             */
-            checkOut: {
-                type: String,
-                value: '',
-                observer: '_checkOutChanged'
-            },
-
-            /**
-             * The number of adult guests
-             */
-            adultCount: {
-                type: Number,
-                value: 1
-            },
-
-            /**
-             * The number of child guests
-             */
-            childCount: {
-                type: Number,
-                observer: '_childCountChanged'
-            },
-
-            /**
-             * Child ages ranging from 1-11
-             * { age: '' }
-             */
-            childAges: {
-                type: Array,
-                value: function () {
-                    return [];
-                }
-            },
-
-        },
-
-        _provider: null,
-
-        attached: function () {
-            this._checkAndSubscribeProvider();
-            this._checkInChanged();
+        /* *
+         * The location to search from.
+         * Must be a value picked from suggested locations.
+         */
+        location: {
+            type: Object,
+            value: function() {
+                return null
+            }
         },
 
         /**
-         * search provider 
+         * The date of checking in the hotel.
          */
-        _checkAndSubscribeProvider: function () {
-            this.set('_provider', Polymer.dom(this).querySelector('#searchProvider'));
-            if (!this._provider) {
-                console.error('no search provider resolved with id #searchProvider');
-            }
-            if (typeof this._provider.search != 'function') {
-                console.error('no "search" function is present in given search provider');
-            }
-            this._provider.addEventListener('success', this._successCallback.bind(this));
-            this._provider.addEventListener('error', this._errorCallback.bind(this));
+        checkIn: {
+            type: String,
+            value: '',
+            observer: '_checkInChanged'
         },
 
         /**
-         * Utility function to construcut child age drop down label ex. Child 1
+         * The date of checking out from the hotel
          */
-        _childAgeDropdownLabel: function (index) {
-            return "Child " + (index + 1) + " age";
+        checkOut: {
+            type: String,
+            value: '',
+            observer: '_checkOutChanged'
         },
 
         /**
-         * Observer to keep children count and childAges array in sync
+         * The number of adult guests
          */
-        _childCountChanged: function (newValue, oldValue) {
-            if (oldValue == undefined)  //very first time on element instantiation oldValue will be undefined
-                oldValue = 0;
+        adultCount: {
+            type: Number,
+            value: 1
+        },
 
-            if (newValue > oldValue) {
-                for (var i = 0; i < (newValue - oldValue) ; i++) {
-                    //https://github.com/Polymer/polymer/issues/1839 -  
-                    //keeping above bug, pushing object instead of string/number
-                    this.push('childAges', { age: '' });
-                };
-            }
-            else if (newValue < oldValue) {
-                for (var i = 0; i < (oldValue - newValue) ; i++) {
-                    this.pop('childAges');
-                };
+        /**
+         * The number of child guests
+         */
+        childCount: {
+            type: Number,
+            observer: '_childCountChanged'
+        },
+
+        /**
+         * Child ages ranging from 1-11
+         * { age: '' }
+         */
+        childAges: {
+            type: Array,
+            value: function() {
+                return [];
             }
         },
 
-        /* Observer to handle check in < check out by setting check out min value  */
-        _checkInChanged: function () {
-            setTimeout(function(){
-                if (this.checkIn != '') {
+    },
+
+
+    attached: function() {
+        //this._checkAndSubscribeProvider();
+        this._checkInChanged();
+    },
+
+    /**
+     * Utility function to construcut child age drop down label ex. Child 1
+     */
+    _childAgeDropdownLabel: function(index) {
+        return "Child " + (index + 1) + " age";
+    },
+
+    /**
+     * Observer to keep children count and childAges array in sync
+     */
+    _childCountChanged: function(newValue, oldValue) {
+        if (oldValue == undefined) //very first time on element instantiation oldValue will be undefined
+            oldValue = 0;
+
+        if (newValue > oldValue) {
+            for (var i = 0; i < (newValue - oldValue); i++) {
+                //https://github.com/Polymer/polymer/issues/1839 -  
+                //keeping above bug, pushing object instead of string/number
+                this.push('childAges', {
+                    age: ''
+                });
+            };
+        } else if (newValue < oldValue) {
+            for (var i = 0; i < (oldValue - newValue); i++) {
+                this.pop('childAges');
+            };
+        }
+    },
+
+    /* Observer to handle check in < check out by setting check out min value  */
+    _checkInChanged: function() {
+        setTimeout(function() {
+            if (this.checkIn != '') {
                 var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 1)
                 if (this.$.checkOut.picker) {
                     this.$.checkOut.picker.set('min', new Date(nextDay));
                     //Patch ATOM 501 additional issue, the next months were not populating in Iphone
-                    setTimeout(function(){
+                    setTimeout(function() {
                         this.$.checkOut.picker.render(true);
                     }.bind(this), 1100)
-                        if (new Date(nextDay) >= new Date(this.checkOut)) {
-                            this.$.checkOut._date = new Date(nextDay);
-                        }
+                    if (new Date(nextDay) >= new Date(this.checkOut)) {
+                        this.$.checkOut._date = new Date(nextDay);
                     }
                 }
-            }.bind(this), 10);
-        },
+            }
+        }.bind(this), 10);
+    },
 
-        /* Observer to handle check out > check in by setting check in max value  */
-        _checkOutChanged: function () {
-            setTimeout(function(){
-                if (this.checkOut != '') {
-                    var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() - 1);
-                    if (this.$.checkIn.picker) {
-                        this.$.checkIn.picker.set('max', false);
-                        //Patch ATOM 501 additional issue, the next months were not populating in Iphone
-                        setTimeout(function(){
-                            this.$.checkIn.picker.render(true);
-                        }.bind(this), 1100)
-                    }
-                }
-            }.bind(this), 10);
-        },
-
-        _initiateSearch: function () {
-            //validate controls
-            if (this._validateInput() == false)
-                return;
-
-            //initiate search    
-            this._setUpProviderData();
-            this._provider.search();
-
-            //show api call progress
-            this._showProgress(true);
-        },
-
-        _validateInput: function () {
-            var check = true;
-            var x = this.querySelectorAll('[required]');
-            for (var i = 0; i < x.length; i++) {
-                if (!x[i].validate()) {
-                    check = false;
+    /* Observer to handle check out > check in by setting check in max value  */
+    _checkOutChanged: function() {
+        setTimeout(function() {
+            if (this.checkOut != '') {
+                var previousDay = new Date(this.checkOut).setDate(new Date(this.checkOut).getDate() - 1);
+                if (this.$.checkIn.picker) {
+                    this.$.checkIn.picker.set('max', false);
+                    //Patch ATOM 501 additional issue, the next months were not populating in Iphone
+                    setTimeout(function() {
+                        this.$.checkIn.picker.render(true);
+                    }.bind(this), 1100)
                 }
             }
-            return check;
-        },
+        }.bind(this), 10);
+    },
 
-        _setUpProviderData: function () {
-            this._provider.location = this.location;
-            this._provider.checkIn = this.checkIn;
-            this._provider.checkOut = this.checkOut;
-            this._provider.adultCount = this.adultCount;
-            this._provider.childCount = this.childCount;
-            this._provider.childAges = this.childAges;
-        },
+    _initiateSearch: function() {
+        //validate controls
+        if (this._validateInput() == false)
+            return;
 
-        _showProgress: function (inProgress) {
-            if (inProgress) {
-                this.$.search.label = 'Searching Hotels...';
-                this.$.search.disabled = true;
-            }
-            else {
-                this.$.search.label = 'Search Hotels';
-                this.$.search.disabled = false;
-            }
-        },
+        //initiate search    
+        var request = this._setUpProviderData();
 
-        _successCallback: function (event) {
-            if (event.srcElement == this._provider) { //handle event bubbling case by targeting event soure
-                //hide progress
-                //this._showProgress(true);
-            }
-        },
+        this.fire('t-hotel-search', request);
+        //show api call progress
+        //this._showProgress(true);
+    },
 
-        _errorCallback: function (event) {
-            if (event.srcElement == this._provider) { //handle event bubbling case by targeting event soure
-                this.$.notify.active = true;
-                this.$.notify.message = event.detail;
-
-                //hide progress
-                this._showProgress(false);
+    _validateInput: function() {
+        var check = true;
+        var x = this.querySelectorAll('[required]');
+        for (var i = 0; i < x.length; i++) {
+            if (!x[i].validate()) {
+                check = false;
             }
         }
+        return check;
+    },
 
-    });
+    _setUpProviderData: function() {
+
+        return {
+            location: this.location,
+            checkIn: this.checkIn,
+            checkOut: this.checkOut,
+            adultCount: this.adultCount,
+            childCount: this.childCount,
+            childAges: this.childAges
+        }
+    }
+
+});
 </script>
