@@ -199,9 +199,11 @@ Polymer({
     _checkInChanged: function() {
         setTimeout(function() {
             if (this.checkIn != '') {
-                var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 1)
+                var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 1);
+                var checkoutMaxDate = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 30);
                 if (this.$.checkOut.picker) {
                     this.$.checkOut.picker.set('min', new Date(nextDay));
+                    this.$.checkOut.picker.set('max', new Date(checkoutMaxDate));
                     //Patch ATOM 501 additional issue, the next months were not populating in Iphone
                     setTimeout(function() {
                         this.$.checkOut.picker.render(true);
