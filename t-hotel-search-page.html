@@ -2,9 +2,10 @@
 <link rel="import" href="../t-sessionstorage/t-sessionstorage.html">
 <link rel="import" href="../t-notify/t-notify.html">
 <link rel="import" href="../t-shared-lib/t-search-page-behaviour.html">
+<link rel="import" href="../t-shared-lib/t-search-api.html">
 
 <link rel="import" href="t-hotel-search.html">
-<link rel="import" href="t-hotel-search-provider.html">
+<link rel="import" href="t-hotel-search-api-decorator.html">
 <!--
 This component is a form that allows a user to search for Hotels.
 It exposes certain prperties which allow control over different aspects
@@ -32,12 +33,23 @@ necessary for searching
             id="searchView" 
             api-base-url="[[apiBaseUrl]]" 
             data-url="[[apiBaseUrl]]api/content/autosuggest/" query-params="token=[[authToken]]" 
-            on-t-hotel-search="onSearch">
-            <t-hotel-search-provider id="searchApi" api-base-url="[[apiBaseUrl]]" api-relative-url="api/hotel/search" auth-token="[[authToken]]" on-t-hotel-search-provider-success="onSearchSuccess" on-t-hotel-search-provider-error="onSearchError" on-request="">
-            </t-hotel-search-provider>
+            on-t-hotel-search-validate="onSearch">
         </t-hotel-search>
         
 
+        <t-hotel-search-api-decorator
+            input="[[searchedData]]"
+            output="{{searchRequest}}">
+        </t-hotel-search-api-decorator>
+        <t-search-api
+            id="searchApi" 
+            data="[[searchRequest]]" 
+            api-base-url="[[apiBaseUrl]]" 
+            api-relative-url="api/hotel/search" 
+            auth-token="[[authToken]]" 
+            on-t-hotel-search-success="onSearchSuccess"
+            on-t-hotel-search-error="onSearchError">
+        </t-search-api>
         <t-sessionstorage
             id="sessionStore"
             api-url-format="{{apiUrlFormat}}"

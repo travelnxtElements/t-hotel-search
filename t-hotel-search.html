@@ -6,6 +6,8 @@
 <link rel="import" href="../t-dropdown/t-dropdown.html">
 <link rel="import" href="../t-notify/t-notify.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../t-shared-lib/t-form-behavior.html" />
+<link rel="import" href="../t-text-container/t-search-form-styles.html" />
 <!--
 This component is a form that allows a user to search for Hotels.
 It exposes certain prperties which allow control over different aspects
@@ -19,32 +21,10 @@ necessary for searching
 
 -->
 <dom-module id="t-hotel-search">
+    <style include="t-search-form-styles"></style>
     <style include="iron-flex">
-    :host {
-        font-family: var(--primary-font-family);
-        padding: var(--form-spacing,10px);
-        display:block;
-    }
-    
-    
-    .margin-horizontal {
-        margin-right: var(--form-spacing,10px);
-    }
-    
-    .margin-horizontal:last-of-type {
+    .horizontal-margin-right:last-of-type {
         margin-right: 0;
-    }
-    
-    .row {
-        margin: 20px 0;
-        display: block;
-    }
-    .row:first-child{
-        margin: 0 0 20px 0;
-        display: block;
-    }
-    #search {
-        margin-top: 10px;
     }
     
     .dropdown {
@@ -56,9 +36,9 @@ necessary for searching
                 <t-autosuggest id="location" name="location" data-url="[[dataUrl]]" query-params="[[queryParams]]" required selected-item="{{location}}" class="flex" label="Search city, address, zip or landmark" token-param="formattedAddress" error-message="You missed this."></t-autosuggest>
             </div>
             <div class="horizontal layout row">
-                <t-calendar class="flex margin-horizontal" required label="Check-in" name="checkIn" id="checkIn" selected-date="{{checkIn}}" error-msg="You missed this." format="mm/dd/yyyy">
+                <t-calendar class="flex horizontal-margin-right" required label="Check-in" name="checkIn" id="checkIn" selected-date="{{checkIn}}" error-msg="You missed this." format="mm/dd/yyyy">
                 </t-calendar>
-                <!-- margin-horizontal is for margin right -->
+                <!-- horizontal-margin-right is for margin right -->
                 <t-calendar class="flex" required label="Check-out" name="checkOut" id="checkOut" selected-date="{{checkOut}}" error-msg="You missed this." format="mm/dd/yyyy">
                 </t-calendar>
             </div>
@@ -68,9 +48,9 @@ necessary for searching
             <div class="horizontal layout row">
                 <t-stepper class="flex" min="0" max="3" secondary-label="(0-11 years)" plural-label="Children" singular-label="Child" count="{{childCount}}" id="childCount"></t-stepper>
             </div>
-            <div class="horizontal layout row">
+            <div class="horizontal layout row" hidden$="[[!_checkChild(childCount)]]">
                 <template is="dom-repeat" items="{{childAges}}" as="item">
-                    <t-dropdown class="dropdown margin-horizontal" error-message="Age missing!" label="{{_childAgeDropdownLabel(index)}}"  selected-item="{{item.age}}" required>
+                    <t-dropdown class="dropdown horizontal-margin-right" error-message="Age missing!" label="{{_childAgeDropdownLabel(index)}}"  selected-item="{{item.age}}" required>
                             <dropdown-item value="0">&lt;1 year</dropdown-item>
                             <dropdown-item value="1">1 year</dropdown-item>
                             <dropdown-item value="2">2 years</dropdown-item>
@@ -99,6 +79,11 @@ necessary for searching
 Polymer({
 
     is: 't-hotel-search',
+
+    /*
+     * <p>Behaviour to validate forms and other.</p>
+     */
+    behaviors: [TravelNxt.Behaviors.FormBehavior],
 
     properties: {
 
@@ -166,6 +151,9 @@ Polymer({
         this._checkInChanged();
     },
 
+    _checkChild: function(number){
+        return number > 0; 
+    },
     /**
      * Utility function to construcut child age drop down label ex. Child 1
      */
@@ -234,26 +222,15 @@ Polymer({
 
     _initiateSearch: function() {
         //validate controls
-        if (this._validateInput() == false)
+        if (this.validate() == false)
             return;
 
         //initiate search    
         var request = this._setUpProviderData();
 
-        this.fire('t-hotel-search', request);
+        this.fire('t-hotel-search-validate', request);
         //show api call progress
         //this._showProgress(true);
-    },
-
-    _validateInput: function() {
-        var check = true;
-        var x = this.querySelectorAll('[required]');
-        for (var i = 0; i < x.length; i++) {
-            if (!x[i].validate()) {
-                check = false;
-            }
-        }
-        return check;
     },
 
     _setUpProviderData: function() {
