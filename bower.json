@@ -1,6 +1,6 @@
 {
   "name": "t-hotel-search",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
     "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
@@ -24,7 +24,7 @@
     "test",
     "tests"
   ],
-   "dependencies": {
+  "dependencies": {
     "polymer": "Polymer/polymer#^1.0.0",
     "t-shared-lib": "travelnxtelements/t-shared-lib#^1.0.2",
     "t-input": "atomelements/t-input#^1.2.6",
