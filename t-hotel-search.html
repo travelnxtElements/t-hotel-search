@@ -35,6 +35,16 @@ Example:
             query-params="token=[[authToken]]" 
             on-t-hotel-search-validate="onSearch">
         </t-hotel-search>
+
+Note:
+The form handles below mentioned scenarios on its own.
+
+1. You can't search for past dates.
+2. Minimum booking date difference is 1 day ie: user have to book hotel atleast for a day so check out date is always greater than check in.
+3. A minimum of 1 adult is required to book a hotel.
+4. Children are considered below 12yrs old.
+5. Child date of birth is mandatory.
+
 -->
 <dom-module id="t-hotel-search">
     <style include="t-search-form-styles"></style>
@@ -103,7 +113,7 @@ Polymer({
 
     properties: {
         /**
-        * Fired when the hotel search is validated with all the required fields filled.
+        * Fired when the hotel search is validated when all the fields are filled.
         *
         * @event t-hotel-search-validate
         */ 

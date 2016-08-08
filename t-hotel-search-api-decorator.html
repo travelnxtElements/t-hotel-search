@@ -8,6 +8,20 @@
             input="[[something]]"
             output="{{searchCriteria}}">
         </t-hotel-search-api-decorator>`
+
+    Example input object:
+
+            `{
+                location: this.location,
+                checkIn: this.checkIn,
+                checkOut: this.checkOut,
+                adultCount: this.adultCount,
+                childCount: this.childCount,
+                childAges: this.childAges
+            }`
+    TODO: 
+    1. We are going to expose an error property to show error.
+    2. We are going to expose a property for build function to be able to handle the build request from outside.
 -->
 <dom-module id="t-hotel-search-api-decorator">
 </dom-module>
@@ -36,6 +50,10 @@ Polymer({
         output: {
             type: Object,
             notify: true
+        },
+        prop:{
+            type:Array,
+            value: []
         }
     },
 
@@ -44,7 +62,8 @@ Polymer({
         var query = {
             "destination": detail.location,
             "checkInDate": {
-                "date": detail.checkIn,
+                "date": detail.
+                ,
                 "systemDateTime": this._toSystemDateTimeFormat(new Date(detail.checkIn)) //if detail.checkIn is not mm/dd/yyyy or en-US culture, parse string according to culture / globalization                     
             },
             "checkOutDate": {
