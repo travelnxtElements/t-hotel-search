@@ -10,15 +10,31 @@
 <link rel="import" href="../t-text-container/t-search-form-styles.html" />
 <!--
 This component is a form that allows a user to search for Hotels.
-It exposes certain prperties which allow control over different aspects
-of searching.
 
-There are fundamentally three types of properties that form the public
-api of this component.
+There are fundamentally three  properties that needs to be filled to run the form/run the location autosuggest. They are
+`api-base-url,  data-url, query-params`.
 
-__User input__: Properties like `location`, `adultCount` etc. reflect the user input
-necessary for searching
+The form gives a simple object with the event `t-hotel-search-validate` with values of each fields exposed as properties.
+Object:
+            `{
+                location: this.location,
+                checkIn: this.checkIn,
+                checkOut: this.checkOut,
+                adultCount: this.adultCount,
+                childCount: this.childCount,
+                childAges: this.childAges
+            }`
+To preselect some value in the form pass the value of the property while initiating t-hotel-search.
 
+Example:
+
+        <t-hotel-search 
+            id="searchView" 
+            api-base-url="[[apiBaseUrl]]" 
+            data-url="[[apiBaseUrl]]api/content/autosuggest/" 
+            query-params="token=[[authToken]]" 
+            on-t-hotel-search-validate="onSearch">
+        </t-hotel-search>
 -->
 <dom-module id="t-hotel-search">
     <style include="t-search-form-styles"></style>
@@ -86,6 +102,12 @@ Polymer({
     behaviors: [TravelNxt.Behaviors.FormBehavior],
 
     properties: {
+        /**
+        * Fired when the hotel search is validated with all the required fields filled.
+        *
+        * @event t-hotel-search-validate
+        */ 
+
 
         /* *
          * The location to search from.
@@ -161,6 +183,7 @@ Polymer({
     _checkChild: function(number){
         return number > 0; 
     },
+
     /**
      * Utility function to construcut child age drop down label ex. Child 1
      */
@@ -227,6 +250,7 @@ Polymer({
         }.bind(this), 10);
     },
 
+    /*This metthod is called when the search button is pressed*/
     _initiateSearch: function() {
         //validate controls
         if (this.validate() == false)
@@ -240,6 +264,7 @@ Polymer({
         //this._showProgress(true);
     },
 
+    /*This function creates the form object to pass on the `search-validate` event*/
     _setUpProviderData: function() {
 
         return {

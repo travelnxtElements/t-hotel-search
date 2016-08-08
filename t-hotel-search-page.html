@@ -7,16 +7,17 @@
 <link rel="import" href="t-hotel-search.html">
 <link rel="import" href="t-hotel-search-api-decorator.html">
 <!--
-This component is a form that allows a user to search for Hotels.
-It exposes certain prperties which allow control over different aspects
-of searching.
+This is a hotel search page component which will allow user to handle all the session handling with building search request for mystique apis.
+The page gives a succes event on successful completion of fetching search id, and throws an event with search Id in the event detail.
 
-There are fundamentally three types of properties that form the public
-api of this component.
+Example:
 
-__User input__: Properties like `location`, `adultCount` etc. reflect the user input
-necessary for searching
-
+        <t-hotel-search-page
+            id="searchPage"
+            api-base-url="http://qa-mystiquecode.tavisca.com/"
+            auth-token="{{tokenResponse.authenticationToken}}"
+            api-url-format="/api/Session/SESSIONKEY">
+        </t-hotel-search-page>
 -->
 <dom-module id="t-hotel-search-page">
     <style include="iron-flex">

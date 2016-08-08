@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <!--
+    The decorator component basically takes an input, observes it and gives away an output with its notify on.
     `<t-hotel-search-api-decorator>` is a polymer component that generates the  msytique request for hotel.
     Basic usage
     
@@ -20,13 +21,16 @@ Polymer({
 
     properties: {
 
-        //the data object to bind to populate data
+        /**
+         * Pass input of the decorator
+         * @type {Object}
+         */
         input: {
             type: Object
         },
 
         /**
-         * Stores output of the decorator
+         * Stores output of the decorator with notify on.
          * @type {Object}
          */
         output: {
@@ -34,6 +38,8 @@ Polymer({
             notify: true
         }
     },
+
+    //the function to create the object and assign it to the output object
     _buildData: function(detail) {
         var query = {
             "destination": detail.location,
