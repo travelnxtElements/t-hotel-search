@@ -36,7 +36,8 @@
     "t-calendar": "atomelements/t-calendar#^1.2.0",
     "t-sessionstorage": "travelnxtElements/t-sessionstorage#^1.0.0",
     "t-notify": "atomelements/t-notify#^1.1.1",
-    "t-dropdown": "atomelements/t-dropdown#^2.0.1"
+    "t-dropdown": "atomelements/t-dropdown#^2.0.1",
+    "t-stepper": "atomelements/t-stepper#^1.0.0"
   },
   "devDependencies": {
     "t-mystique-auth": "travelnxtelements/t-mystique-auth#^1.0.0",
