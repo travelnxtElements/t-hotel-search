@@ -9,32 +9,33 @@
 <link rel="import" href="../t-shared-lib/t-form-behavior.html" />
 <link rel="import" href="../t-text-container/t-search-form-styles.html" />
 <!--
-This component is a form that allows a user to search for Hotels.
+This component is a form that fires an event with search request object on successfull submission. 
 
-There are fundamentally three  properties that needs to be filled to run the form/run the location autosuggest. They are
-`api-base-url,  data-url, query-params`.
+There are two  properties that are required to run this form which initialize the location autosuggest. These are
+`data-url`, `query-params`.
 
-The form gives a simple object with the event `t-hotel-search-validate` with values of each fields exposed as properties.
-Object:
-            `{
-                location: this.location,
-                checkIn: this.checkIn,
-                checkOut: this.checkOut,
-                adultCount: this.adultCount,
-                childCount: this.childCount,
-                childAges: this.childAges
-            }`
+This component triggers the event `t-hotel-search-validate` with an object containing values of all input fields in event details.
+Object created with the `t-hotel-search-validate`:
+
+    {
+        location: this.location,
+        checkIn: this.checkIn,
+        checkOut: this.checkOut,
+        adultCount: this.adultCount,
+        childCount: this.childCount,
+        childAges: this.childAges
+    }
+
 To preselect some value in the form pass the value of the property while initiating t-hotel-search.
 
 Example:
 
-        <t-hotel-search 
-            id="searchView" 
-            api-base-url="[[apiBaseUrl]]" 
-            data-url="[[apiBaseUrl]]api/content/autosuggest/" 
-            query-params="token=[[authToken]]" 
-            on-t-hotel-search-validate="onSearch">
-        </t-hotel-search>
+    <t-hotel-search 
+        id="searchView" 
+        data-url="e.g BASEURL/api/content/autosuggest/" 
+        query-params="e.g token=[[authToken]]" 
+        on-t-hotel-search-validate="onSearch">
+    </t-hotel-search>
 
 Note:
 The form handles below mentioned scenarios on its own.
@@ -43,7 +44,7 @@ The form handles below mentioned scenarios on its own.
 2. Minimum booking date difference is 1 day ie: user have to book hotel atleast for a day so check out date is always greater than check in.
 3. A minimum of 1 adult is required to book a hotel.
 4. Children are considered below 12yrs old.
-5. Child date of birth is mandatory.
+5. Child age is mandatory.
 
 -->
 <dom-module id="t-hotel-search">
@@ -113,7 +114,7 @@ Polymer({
 
     properties: {
         /**
-        * Fired when the hotel search is validated when all the fields are filled.
+        * Fired when the search button is clicked and all fields are validated.
         *
         * @event t-hotel-search-validate
         */ 
@@ -123,28 +124,21 @@ Polymer({
          * The location to search from.
          * Must be a value picked from suggested locations.
          */
-        location: {
-            type: Object,
-            value: function() {
-                return null
-            }
-        },
+        location: Object,
 
         /**
-         * The date of checking in the hotel.
+         * The date of checking in the hotel. Date format used is dd/mm/yyyy
          */
         checkIn: {
             type: String,
-            value: '',
             observer: '_checkInChanged'
         },
 
         /**
-         * The date of checking out from the hotel
+         * The date of checking out from the hotel. Date format used is dd/mm/yyyy
          */
         checkOut: {
             type: String,
-            value: '',
             observer: '_checkOutChanged'
         },
 
@@ -161,12 +155,12 @@ Polymer({
          */
         childCount: {
             type: Number,
+            value: 0,
             observer: '_childCountChanged'
         },
 
         /**
-         * Child ages ranging from 1-11
-         * { age: '' }
+         * Child ages ranging from 0-11
          */
         childAges: {
             type: Array,
@@ -190,6 +184,9 @@ Polymer({
         this._checkInChanged();
     },
 
+    /**
+     * Checks if child count is greater than 0.
+     */
     _checkChild: function(number){
         return number > 0; 
     },
@@ -226,7 +223,7 @@ Polymer({
     /* Observer to handle check in < check out by setting check out min value  */
     _checkInChanged: function() {
         setTimeout(function() {
-            if (this.checkIn != '') {
+            if (this.checkIn !== '' || this.checkIn !== undefined) {
                 var nextDay = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 1);
                 var checkoutMaxDate = new Date(this.checkIn).setDate(new Date(this.checkIn).getDate() + 30);
                 if (this.$.checkOut.picker) {
