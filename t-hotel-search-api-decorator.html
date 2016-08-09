@@ -62,8 +62,7 @@ Polymer({
         var query = {
             "destination": detail.location,
             "checkInDate": {
-                "date": detail.
-                ,
+                "date": detail..checkIn,
                 "systemDateTime": this._toSystemDateTimeFormat(new Date(detail.checkIn)) //if detail.checkIn is not mm/dd/yyyy or en-US culture, parse string according to culture / globalization                     
             },
             "checkOutDate": {
