@@ -121,13 +121,22 @@ Polymer({
 
 
         /* *
-         * The location to search from.
-         * Must be a value picked from suggested locations.
+         * The location to search for.
+         * Must be a value picked from location autosuggest or an object with location details.
+         * Location object's `formattedAddress` value is used for display in location text.
+         * e.g.:
+         *
+         * `{
+         *    "formattedAddress":"Las Vegas",
+         *    "code":"LAS"
+         * }`
          */
         location: Object,
 
         /**
-         * This property stores the value of autosuggest api url. 
+         * This property should have the value of a compatible autosuggest api url.
+         * Autosuggest api should return valid options based on a GET call to this url after appending `'/{text entered in location field}?{queryParams}'`
+         * Suggestions are requested after 3 characters have been entered. 
          */
         dataUrl: String,
 
@@ -137,7 +146,7 @@ Polymer({
         queryParams: String,
 
         /**
-         * The date of checking in the hotel. Date format used is dd/mm/yyyy
+         * The date of checking in at the hotel. Date format used is dd/mm/yyyy
          */
         checkIn: {
             type: String,
@@ -153,7 +162,7 @@ Polymer({
         },
 
         /**
-         * The number of adult guests. Maximum value is 5.
+         * The number of adult guests. Starting with 1 upto a max of 5.
          */
         adultCount: {
             type: Number,
@@ -161,7 +170,7 @@ Polymer({
         },
 
         /**
-         * The number of child guests. Maximum value is 3.
+         * Number of children upto a max of 3.
          */
         childCount: {
             type: Number,
@@ -170,8 +179,17 @@ Polymer({
         },
 
         /**
-         * Child ages ranging from 0-11
-         */
+         * This is an array of child ages which ranges from 0 to 11.
+         * Ages can be set by setting an array of objects containing a property age with value of children ages between 0 to 11. 
+         * e.g.:
+         *
+         * `[
+         *    {"age":5},
+         *    {"age":2}
+         * ]` 
+         *
+         * Ages dropdown is displayed when childCount is greater than 0.
+         **/
         childAges: {
             type: Array,
             value: function() {
