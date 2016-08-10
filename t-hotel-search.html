@@ -127,6 +127,16 @@ Polymer({
         location: Object,
 
         /**
+         * This property stores the value of autosuggest api url. 
+         */
+        dataUrl: String,
+
+        /**
+         * This property stores the value of autosuggest api query parameters. 
+         */
+        queryParams: String,
+
+        /**
          * The date of checking in the hotel. Date format used is dd/mm/yyyy
          */
         checkIn: {
@@ -143,7 +153,7 @@ Polymer({
         },
 
         /**
-         * The number of adult guests
+         * The number of adult guests. Maximum value is 5.
          */
         adultCount: {
             type: Number,
@@ -151,7 +161,7 @@ Polymer({
         },
 
         /**
-         * The number of child guests
+         * The number of child guests. Maximum value is 3.
          */
         childCount: {
             type: Number,
